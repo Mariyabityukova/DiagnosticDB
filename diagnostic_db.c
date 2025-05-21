@@ -1,7 +1,7 @@
 /*
- * Реализация модуля работы с базой данных диагностических программ
- * Автор: Битюкова М.С., группа бИСТ231
- * Версия: 2.1
+ * Р РµР°Р»РёР·Р°С†РёСЏ РјРѕРґСѓР»СЏ СЂР°Р±РѕС‚С‹ СЃ Р±Р°Р·РѕР№ РґР°РЅРЅС‹С… РґРёР°РіРЅРѕСЃС‚РёС‡РµСЃРєРёС… РїСЂРѕРіСЂР°РјРј
+ * РђРІС‚РѕСЂ: Р‘РёС‚СЋРєРѕРІР° Рњ.РЎ., РіСЂСѓРїРїР° Р±РРЎРў231
+ * Р’РµСЂСЃРёСЏ: 2.1
  */
 
 #include "diagnostic_db.h"
@@ -9,16 +9,16 @@
 #include <string.h>
 #include <ctype.h>
 
-/* Внутренние вспомогательные функции */
+/* Р’РЅСѓС‚СЂРµРЅРЅРёРµ РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё */
 
-/* Сравнивает объекты по имени */
+/* РЎСЂР°РІРЅРёРІР°РµС‚ РѕР±СЉРµРєС‚С‹ РїРѕ РёРјРµРЅРё */
 static int compareByName(const void* a, const void* b) {
     const DiagnosticProgram* pa = (const DiagnosticProgram*)a;
     const DiagnosticProgram* pb = (const DiagnosticProgram*)b;
     return strcmp(pa->name, pb->name);
 }
 
-/* Сравнивает объекты по году выпуска */
+/* РЎСЂР°РІРЅРёРІР°РµС‚ РѕР±СЉРµРєС‚С‹ РїРѕ РіРѕРґСѓ РІС‹РїСѓСЃРєР° */
 static int compareByYear(const void* a, const void* b) {
     const DiagnosticProgram* pa = (const DiagnosticProgram*)a;
     const DiagnosticProgram* pb = (const DiagnosticProgram*)b;
@@ -26,7 +26,7 @@ static int compareByYear(const void* a, const void* b) {
 }
 
 /*
-   Получает значение поля из строки внешнего файла формата csv
+   РџРѕР»СѓС‡Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ РїРѕР»СЏ РёР· СЃС‚СЂРѕРєРё РІРЅРµС€РЅРµРіРѕ С„Р°Р№Р»Р° С„РѕСЂРјР°С‚Р° csv
 */
 void getField(char* line, int num, char delim, char* result, size_t result_size, int* is_cumul_res_ok) {
     char* start = line;
@@ -58,11 +58,11 @@ void getField(char* line, int num, char delim, char* result, size_t result_size,
     }
 }
 
-/* Основные функции */
+/* РћСЃРЅРѕРІРЅС‹Рµ С„СѓРЅРєС†РёРё */
 
 /*
-   Ручной ввод данных новой программы
-   program - указатель на массив структур данных всех программ
+   Р СѓС‡РЅРѕР№ РІРІРѕРґ РґР°РЅРЅС‹С… РЅРѕРІРѕР№ РїСЂРѕРіСЂР°РјРјС‹
+   program - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ СЃС‚СЂСѓРєС‚СѓСЂ РґР°РЅРЅС‹С… РІСЃРµС… РїСЂРѕРіСЂР°РјРј
 */
 static int inputProgram(DiagnosticProgram* program) {
     if (!program) return 0;
@@ -72,51 +72,51 @@ static int inputProgram(DiagnosticProgram* program) {
         continue;
     }
     
-    printf("Название: ");
+    printf("РќР°Р·РІР°РЅРёРµ: ");
     char nameBuffer[MAX_NAME_LEN];
     if (fgets(nameBuffer, sizeof(nameBuffer), stdin) == NULL) return 0;
-    nameBuffer[strcspn(nameBuffer, "\n")] = '\0'; // Удаление символа новой строки
+    nameBuffer[strcspn(nameBuffer, "\n")] = '\0'; // РЈРґР°Р»РµРЅРёРµ СЃРёРјРІРѕР»Р° РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё
     strncpy(program->name, nameBuffer, sizeof(program->name) - 1);
     program->name[sizeof(program->name) - 1] = '\0';
 
-    printf("Производитель: ");
+    printf("РџСЂРѕРёР·РІРѕРґРёС‚РµР»СЊ: ");
     char manufacturerBuffer[MAX_MANUFACTURER_LEN];
     if (fgets(manufacturerBuffer, sizeof(manufacturerBuffer), stdin) == NULL) return 0;
-    manufacturerBuffer[strcspn(manufacturerBuffer, "\n")] = '\0'; // Удаление символа новой строки
+    manufacturerBuffer[strcspn(manufacturerBuffer, "\n")] = '\0'; // РЈРґР°Р»РµРЅРёРµ СЃРёРјРІРѕР»Р° РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё
     strncpy(program->manufacturer, manufacturerBuffer, sizeof(program->manufacturer) - 1);
     program->manufacturer[sizeof(program->manufacturer) - 1] = '\0';
 
 
-    printf("Версия (например 2.5): ");
+    printf("Р’РµСЂСЃРёСЏ (РЅР°РїСЂРёРјРµСЂ 2.5): ");
     char versionBuffer[MAX_VERSION_LEN];
     if (fgets(versionBuffer, sizeof(versionBuffer), stdin) == NULL) return 0;
-    versionBuffer[strcspn(versionBuffer, "\n")] = '\0'; // Удаление символа новой строки
+    versionBuffer[strcspn(versionBuffer, "\n")] = '\0'; // РЈРґР°Р»РµРЅРёРµ СЃРёРјРІРѕР»Р° РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё
     strncpy(program->version, versionBuffer, sizeof(program->version) - 1);
     program->version[sizeof(program->version) - 1] = '\0';
 
-    printf("Год выпуска: ");
+    printf("Р“РѕРґ РІС‹РїСѓСЃРєР°: ");
     char yearBuffer[6];
     if (fgets(yearBuffer, sizeof(yearBuffer), stdin) == NULL) return 0;
-    yearBuffer[strcspn(yearBuffer, "\n")] = '\0'; // Удаление символа новой строки
+    yearBuffer[strcspn(yearBuffer, "\n")] = '\0'; // РЈРґР°Р»РµРЅРёРµ СЃРёРјРІРѕР»Р° РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё
     program->releaseYear = atoi(yearBuffer);
 
-    printf("Тип лицензии (1-freeware/0-commercial): ");
+    printf("РўРёРї Р»РёС†РµРЅР·РёРё (1-freeware/0-commercial): ");
     char licTypeBuffer[3];
     if (fgets(licTypeBuffer, sizeof(licTypeBuffer), stdin) == NULL) return 0;
-    licTypeBuffer[strcspn(licTypeBuffer, "\n")] = '\0'; // Удаление символа новой строки
+    licTypeBuffer[strcspn(licTypeBuffer, "\n")] = '\0'; // РЈРґР°Р»РµРЅРёРµ СЃРёРјРІРѕР»Р° РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё
     program->isFreeware = atoi(licTypeBuffer);
 
-    printf("Поддерживаемые ОС: ");
+    printf("РџРѕРґРґРµСЂР¶РёРІР°РµРјС‹Рµ РћРЎ: ");
     char osBuffer[MAX_OS_LEN];
     if (fgets(osBuffer, sizeof(osBuffer), stdin) == NULL) return 0;
-    osBuffer[strcspn(osBuffer, "\n")] = '\0'; // Удаление символа новой строки
+    osBuffer[strcspn(osBuffer, "\n")] = '\0'; // РЈРґР°Р»РµРЅРёРµ СЃРёРјРІРѕР»Р° РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё
     strncpy(program->supportedOS, osBuffer, sizeof(program->supportedOS) - 1);
     program->supportedOS[sizeof(program->supportedOS) - 1] = '\0';
 
-    printf("Описание: ");
+    printf("РћРїРёСЃР°РЅРёРµ: ");
     char descBuffer[MAX_DESC_LEN];
     if (fgets(descBuffer, sizeof(descBuffer), stdin) == NULL) return 0;
-    descBuffer[strcspn(descBuffer, "\n")] = '\0'; // Удаление символа новой строки
+    descBuffer[strcspn(descBuffer, "\n")] = '\0'; // РЈРґР°Р»РµРЅРёРµ СЃРёРјРІРѕР»Р° РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё
     strncpy(program->description, descBuffer, sizeof(program->description) - 1);
     program->description[sizeof(program->description) - 1] = '\0';
 
@@ -124,10 +124,10 @@ static int inputProgram(DiagnosticProgram* program) {
 }
 
 /*
-   Записывает данные всех программ во внешний файл формата csv
-   programs - указатель на массив структур данных программ,
-   count - количество программ,
-   filename - имя внешнего файла
+   Р—Р°РїРёСЃС‹РІР°РµС‚ РґР°РЅРЅС‹Рµ РІСЃРµС… РїСЂРѕРіСЂР°РјРј РІРѕ РІРЅРµС€РЅРёР№ С„Р°Р№Р» С„РѕСЂРјР°С‚Р° csv
+   programs - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ СЃС‚СЂСѓРєС‚СѓСЂ РґР°РЅРЅС‹С… РїСЂРѕРіСЂР°РјРј,
+   count - РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРіСЂР°РјРј,
+   filename - РёРјСЏ РІРЅРµС€РЅРµРіРѕ С„Р°Р№Р»Р°
 */
 int writeDataToFile(DiagnosticProgram* programs, int count, const char* filename) {
     if (!programs || count <= 0 || !filename) return -1;
@@ -151,10 +151,10 @@ int writeDataToFile(DiagnosticProgram* programs, int count, const char* filename
 }
 
 /*
-   Загружает данные программ из внешнего файла формата csv
-   programs - указатель на массив структур данных программ,
-   count - количество загруженных программ,
-   filename - имя внешнего файла
+   Р—Р°РіСЂСѓР¶Р°РµС‚ РґР°РЅРЅС‹Рµ РїСЂРѕРіСЂР°РјРј РёР· РІРЅРµС€РЅРµРіРѕ С„Р°Р№Р»Р° С„РѕСЂРјР°С‚Р° csv
+   programs - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ СЃС‚СЂСѓРєС‚СѓСЂ РґР°РЅРЅС‹С… РїСЂРѕРіСЂР°РјРј,
+   count - РєРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… РїСЂРѕРіСЂР°РјРј,
+   filename - РёРјСЏ РІРЅРµС€РЅРµРіРѕ С„Р°Р№Р»Р°
 */
 int readDataFromFile(DiagnosticProgram** programs, int* count, const char* filename) {
 
@@ -197,22 +197,23 @@ int readDataFromFile(DiagnosticProgram** programs, int* count, const char* filen
         int is_cumul_res_ok = 1;
         if (fgets(line, sizeof(line), file) == NULL) {
             is_cumul_res_ok = 0;
-            break;
         }
-        line[strlen(line) - 1] = '\0';
-        getField(line, 1, delim, &(*programs)[i].name, sizeof((*programs)[i].name), &is_cumul_res_ok);
-        getField(line, 2, delim, &(*programs)[i].manufacturer, sizeof((*programs)[i].manufacturer), &is_cumul_res_ok);
-        getField(line, 3, delim, &(*programs)[i].version, sizeof(&(*programs)[i].version), &is_cumul_res_ok);
-        getField(line, 4, delim, releaseYear, sizeof(releaseYear), &is_cumul_res_ok);
-        if (is_cumul_res_ok) {
-            (*programs)[i].releaseYear = atoi(releaseYear);
+        else {
+            line[strlen(line) - 1] = '\0';
+            getField(line, 1, delim, &(*programs)[i].name, sizeof((*programs)[i].name), &is_cumul_res_ok);
+            getField(line, 2, delim, &(*programs)[i].manufacturer, sizeof((*programs)[i].manufacturer), &is_cumul_res_ok);
+            getField(line, 3, delim, &(*programs)[i].version, sizeof(&(*programs)[i].version), &is_cumul_res_ok);
+            getField(line, 4, delim, releaseYear, sizeof(releaseYear), &is_cumul_res_ok);
+            if (is_cumul_res_ok) {
+                (*programs)[i].releaseYear = atoi(releaseYear);
+            }
+            getField(line, 5, delim, isFreeware, sizeof(isFreeware), &is_cumul_res_ok);
+            if (is_cumul_res_ok) {
+                (*programs)[i].isFreeware = atoi(isFreeware);
+            }
+            getField(line, 6, delim, &(*programs)[i].supportedOS, sizeof((*programs)[i].supportedOS), &is_cumul_res_ok);
+            getField(line, 7, delim, &(*programs)[i].description, sizeof((*programs)[i].description), &is_cumul_res_ok);
         }
-        getField(line, 5, delim, isFreeware, sizeof(isFreeware), &is_cumul_res_ok);
-        if (is_cumul_res_ok) {
-            (*programs)[i].isFreeware = atoi(isFreeware);
-        }
-        getField(line, 6, delim, &(*programs)[i].supportedOS, sizeof((*programs)[i].supportedOS), &is_cumul_res_ok);
-        getField(line, 7, delim, &(*programs)[i].description, sizeof((*programs)[i].description), &is_cumul_res_ok);
 
         if (!is_cumul_res_ok) {
             fclose(file);
@@ -228,9 +229,9 @@ int readDataFromFile(DiagnosticProgram** programs, int* count, const char* filen
 }
 
 /*
-   Добавляет новую программу
-   programs - указатель на массив структур данных программ,
-   count - итоговое количество программ
+   Р”РѕР±Р°РІР»СЏРµС‚ РЅРѕРІСѓСЋ РїСЂРѕРіСЂР°РјРјСѓ
+   programs - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ СЃС‚СЂСѓРєС‚СѓСЂ РґР°РЅРЅС‹С… РїСЂРѕРіСЂР°РјРј,
+   count - РёС‚РѕРіРѕРІРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРіСЂР°РјРј
 */
 int addNewProgram(DiagnosticProgram** programs, int* count) {
     if (!programs || !count || *count >= MAX_PROGRAMS_COUNT) return -1;
@@ -241,7 +242,7 @@ int addNewProgram(DiagnosticProgram** programs, int* count) {
     *programs = temp;
     DiagnosticProgram* newProgram = &(*programs)[*count];
 
-    printf("\nДобавление новой программы:\n");
+    printf("\nР”РѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕР№ РїСЂРѕРіСЂР°РјРјС‹:\n");
     if (!inputProgram(newProgram)) {
         return -1;
     }
@@ -251,15 +252,15 @@ int addNewProgram(DiagnosticProgram** programs, int* count) {
 }
 
 /*
-   Редактирует данные выбранной программы
-   programs - указатель на массив структур данных программ,
-   count - общее количество программ,
-   index - индекс редактируемой программы
+   Р РµРґР°РєС‚РёСЂСѓРµС‚ РґР°РЅРЅС‹Рµ РІС‹Р±СЂР°РЅРЅРѕР№ РїСЂРѕРіСЂР°РјРјС‹
+   programs - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ СЃС‚СЂСѓРєС‚СѓСЂ РґР°РЅРЅС‹С… РїСЂРѕРіСЂР°РјРј,
+   count - РѕР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРіСЂР°РјРј,
+   index - РёРЅРґРµРєСЃ СЂРµРґР°РєС‚РёСЂСѓРµРјРѕР№ РїСЂРѕРіСЂР°РјРјС‹
 */
 int editProgram(DiagnosticProgram* programs, int count, int index) {
     if (!programs || count <= 0 || index < 0 || index >= count) return -1;
 
-    printf("\nРедактирование программы #%d:\n", index + 1);
+    printf("\nР РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹ #%d:\n", index + 1);
     if (!inputProgram(&programs[index])) {
         return -1;
     }
@@ -268,10 +269,10 @@ int editProgram(DiagnosticProgram* programs, int count, int index) {
 }
 
 /*
-   Удаляет выбранную программу
-   programs - указатель на массив структур данных программ,
-   count - итоговое количество программ,
-   index - индекс удаляемой программы
+   РЈРґР°Р»СЏРµС‚ РІС‹Р±СЂР°РЅРЅСѓСЋ РїСЂРѕРіСЂР°РјРјСѓ
+   programs - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ СЃС‚СЂСѓРєС‚СѓСЂ РґР°РЅРЅС‹С… РїСЂРѕРіСЂР°РјРј,
+   count - РёС‚РѕРіРѕРІРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРіСЂР°РјРј,
+   index - РёРЅРґРµРєСЃ СѓРґР°Р»СЏРµРјРѕР№ РїСЂРѕРіСЂР°РјРјС‹
 */
 int deleteProgram(DiagnosticProgram* programs, int* count, int index) {
     if (!programs || !count || *count <= 0 || index < 0 || index >= *count) return -1;
@@ -285,12 +286,12 @@ int deleteProgram(DiagnosticProgram* programs, int* count, int index) {
 }
 
 /*
-   Выполняет поиск программ по значению одного из полей данных
-   programs - указатель на массив структур данных программ,
-   count - общее количество программ,
-   key - структура данных, содержащая значение определенного поля для поиска программ,
-   found - указатель на массив найденных программ,
-   foundCount - количество найденных программ
+   Р’С‹РїРѕР»РЅСЏРµС‚ РїРѕРёСЃРє РїСЂРѕРіСЂР°РјРј РїРѕ Р·РЅР°С‡РµРЅРёСЋ РѕРґРЅРѕРіРѕ РёР· РїРѕР»РµР№ РґР°РЅРЅС‹С…
+   programs - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ СЃС‚СЂСѓРєС‚СѓСЂ РґР°РЅРЅС‹С… РїСЂРѕРіСЂР°РјРј,
+   count - РѕР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРіСЂР°РјРј,
+   key - СЃС‚СЂСѓРєС‚СѓСЂР° РґР°РЅРЅС‹С…, СЃРѕРґРµСЂР¶Р°С‰Р°СЏ Р·РЅР°С‡РµРЅРёРµ РѕРїСЂРµРґРµР»РµРЅРЅРѕРіРѕ РїРѕР»СЏ РґР»СЏ РїРѕРёСЃРєР° РїСЂРѕРіСЂР°РјРј,
+   found - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ РЅР°Р№РґРµРЅРЅС‹С… РїСЂРѕРіСЂР°РјРј,
+   foundCount - РєРѕР»РёС‡РµСЃС‚РІРѕ РЅР°Р№РґРµРЅРЅС‹С… РїСЂРѕРіСЂР°РјРј
 */
 int searchPrograms(DiagnosticProgram* programs, int count, DiagnosticProgram key,
     DiagnosticProgram** found, int* foundCount) {
@@ -319,9 +320,9 @@ int searchPrograms(DiagnosticProgram* programs, int count, DiagnosticProgram key
 }
 
 /*
-   Сортирует список программ по имени
-   programs - указатель на массив структур данных программ,
-   count - общее количество программ
+   РЎРѕСЂС‚РёСЂСѓРµС‚ СЃРїРёСЃРѕРє РїСЂРѕРіСЂР°РјРј РїРѕ РёРјРµРЅРё
+   programs - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ СЃС‚СЂСѓРєС‚СѓСЂ РґР°РЅРЅС‹С… РїСЂРѕРіСЂР°РјРј,
+   count - РѕР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРіСЂР°РјРј
 */
 int sortProgramsByName(DiagnosticProgram* programs, int count) {
     if (!programs || count <= 0) return -1;
@@ -330,9 +331,9 @@ int sortProgramsByName(DiagnosticProgram* programs, int count) {
 }
 
 /*
-   Сортирует список программ по году выпуска
-   programs - указатель на массив структур данных программ,
-   count - общее количество программ
+   РЎРѕСЂС‚РёСЂСѓРµС‚ СЃРїРёСЃРѕРє РїСЂРѕРіСЂР°РјРј РїРѕ РіРѕРґСѓ РІС‹РїСѓСЃРєР°
+   programs - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ СЃС‚СЂСѓРєС‚СѓСЂ РґР°РЅРЅС‹С… РїСЂРѕРіСЂР°РјРј,
+   count - РѕР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРіСЂР°РјРј
 */
 int sortProgramsByYear(DiagnosticProgram* programs, int count) {
     if (!programs || count <= 0) return -1;
@@ -341,15 +342,15 @@ int sortProgramsByYear(DiagnosticProgram* programs, int count) {
 }
 
 /*
-   Выводит на экран список всех программ, имеющихся в памяти
-   programs - указатель на массив структур данных программ,
-   count - общее количество программ
+   Р’С‹РІРѕРґРёС‚ РЅР° СЌРєСЂР°РЅ СЃРїРёСЃРѕРє РІСЃРµС… РїСЂРѕРіСЂР°РјРј, РёРјРµСЋС‰РёС…СЃСЏ РІ РїР°РјСЏС‚Рё
+   programs - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ СЃС‚СЂСѓРєС‚СѓСЂ РґР°РЅРЅС‹С… РїСЂРѕРіСЂР°РјРј,
+   count - РѕР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРіСЂР°РјРј
 */
 int displayData(DiagnosticProgram* programs, int count) {
     if (!programs || count <= 0) return -1;
 
     printf("\n%-20s %-20s %-10s %-5s %-11s %-15s\n",
-        "Название", "Производитель", "Версия", "Год", "Тип", "ОС");
+        "РќР°Р·РІР°РЅРёРµ", "РџСЂРѕРёР·РІРѕРґРёС‚РµР»СЊ", "Р’РµСЂСЃРёСЏ", "Р“РѕРґ", "РўРёРї", "РћРЎ");
     printf("---------------------------------------------------------------------------------\n");
 
     for (int i = 0; i < count; i++) {
@@ -360,7 +361,7 @@ int displayData(DiagnosticProgram* programs, int count) {
             programs[i].releaseYear,
             programs[i].isFreeware ? "Freeware" : "Commercial",
             programs[i].supportedOS);
-        printf("Описание: %s\n\n", programs[i].description);
+        printf("РћРїРёСЃР°РЅРёРµ: %s\n\n", programs[i].description);
     }
 
     return 0;
